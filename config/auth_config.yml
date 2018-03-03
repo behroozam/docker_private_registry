@@ -1,0 +1,26 @@
+# A simple example. See reference.yml for explanation for explanation of all options.
+server:
+  addr: ":5000"
+  certificate: "/ssl/fullchain.pem"
+  key: "/ssl/privkey.pem"
+
+token:
+  realm: "https://127.0.0.1:5000/auth"
+  rootcertbundle: "/ssl/fullchain.pem"
+  issuer: "Acme auth server"  # Must match issuer in the Registry config.
+  expiration: 900
+
+users:
+  # Password is specified as a BCrypt hash. Use htpasswd -B to generate.
+  "admin":
+    password: "$2y$05$LO.vzwpWC5LZGqThvEfznu8qhb5SGqvBSWY1J3yZ4AxtMRZ3kN5jC"  # badmin
+  "test":
+    password: "$2y$05$WuwBasGDAgr.QCbGIjKJaep4dhxeai9gNZdmBnQXqpKly57oNutya"  # 123
+acl:
+  - match: {account: "admin"}
+    actions: ["*"]
+    comment: "Admin has full access to everything."
+  - match: {account: "user"}
+    actions: ["pull"]
+    comment: "User \"user\" can pull stuff."
+  # Access is denied by default.

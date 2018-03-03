@@ -1,0 +1,29 @@
+registry:
+  restart: always
+  image: registry:2
+  ports:
+    - "443:443"
+  environment:
+   - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/fullchain.pem
+   - REGISTRY_HTTP_TLS_KEY=/certs/privkey.pem
+   - REGISTRY_HTTP_ADDR= :443
+   - REGISTRY_AUTH=token
+   - REGISTRY_AUTH_TOKEN_REALM=https://yourdomain:5000/auth
+   - REGISTRY_AUTH_TOKEN_SERVICE="Docker registry"
+   - REGISTRY_AUTH_TOKEN_ISSUER="Acme auth server"
+   - REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE=/certs/fullchain.pem
+  volumes:
+    - /registry/data:/var/lib/registry
+    - /registry/certs:/certs
+    - /registry/auth:/auth
+
+dockerauth:
+  image: cesanta/docker_auth:stable
+  ports:
+    - "5000:5000"
+  volumes:
+    - /registry/config:/config:ro
+    - /registry/log/docker_auth:/logs
+    - /registry/ssl:/ssl
+  command: /config/auth_config.yml
+  restart: always
